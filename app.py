@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestRegressor
 
 # Title
@@ -10,7 +11,7 @@ st.title("🌿 University Green Space & Wellbeing Predictor")
 df = pd.read_csv("university_student_wellbeing_synthetic.csv")
 
 # Define features and target
-features = ["NDVI Score","Walking Distance (mins)", "Shade Coverage (%)", "Academic Stress Level"]
+features = ["NDVI Score", "Walking Distance (mins)", "Shade Coverage (%)", "Academic Stress Level"]
 target = "Predicted Wellbeing Score"
 
 # Sidebar - Input Parameters
@@ -40,3 +41,15 @@ st.metric(label="Wellbeing Score", value=round(prediction, 2))
 # Show inputs
 st.subheader("📋 Your Input Summary")
 st.dataframe(input_df)
+
+# 📊 Visualizations
+st.markdown("---")
+st.subheader("📈 How Each Feature Relates to Wellbeing Score")
+
+for feature in features:
+    fig, ax = plt.subplots()
+    ax.scatter(df[feature], df[target], color="mediumseagreen", alpha=0.7)
+    ax.set_xlabel(feature)
+    ax.set_ylabel("Predicted Wellbeing Score")
+    ax.set_title(f"{feature} vs Wellbeing Score")
+    st.pyplot(fig)
