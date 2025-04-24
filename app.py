@@ -1,45 +1,45 @@
 import streamlit as st
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
 
-# Load Excel file
-@st.cache_data
-def load_data():
-    df = pd.read_excel("Bookc2excek.xlsx", sheet_name="Sheet1")
-    df.fillna(df.mean(numeric_only=True), inplace=True)
-    df = pd.get_dummies(df, columns=["Gender", "Green Space Type"], drop_first=True)
-    return df
+# Title
+st.set_page_config(page_title="Green Space Wellbeing Predictor", layout="centered")
+st.title("🌿 University Green Space & Wellbeing Predictor")
 
-df = load_data()
+# Load dataset
+df = pd.read_csv("university_student_wellbeing_synthetic.csv")
 
-# Feature selection
+# Define features and target
 features = ["NDVI Score", "Tree Density", "Green Space Area (sq.meters)",
-            "Walking Distance (mins)", "Shade Coverage (%)"]
-X = df[features]
-y = df["Predicted Wellbeing Score"]
+            "Walking Distance (mins)", "Shade Coverage (%)", "Academic Stress Level"]
+target = "Predicted Wellbeing Score"
+
+# Sidebar - Input Parameters
+st.sidebar.header("Input Green Space and Student Parameters")
+
+ndvi = st.sidebar.slider("NDVI Score", 0.3, 0.9, 0.6)
+tree_density = st.sidebar.slider("Tree Density", 1.0, 10.0, 5.0)
+area = st.sidebar.number_input("Green Space Area (sq. meters)", 100, 10000, 5000)
+walk = st.sidebar.slider("Walking Distance (mins)", 1, 30, 10)
+shade = st.sidebar.slider("Shade Coverage (%)", 0.0, 100.0, 50.0)
+stress = st.sidebar.slider("Academic Stress Level", 1, 10, 5)
+
+# Prepare input
+input_df = pd.DataFrame([[ndvi, tree_density, area, walk, shade, stress]], columns=features)
 
 # Train model
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
-model = RandomForestRegressor(n_estimators=200, max_depth=10, random_state=42)
-model.fit(X_scaled, y)
+X = df[features]
+y = df[target]
+model = RandomForestRegressor(n_estimators=100, random_state=42)
+model.fit(X, y)
 
-# UI
-st.title("🌿 Green Space & Student Wellbeing Predictor")
+# Make prediction
+prediction = model.predict(input_df)[0]
 
-ndvi = st.slider("NDVI Score", 0.0, 1.0, 0.7)
-tree_density = st.slider("Tree Density", 0, 10, 5)
-area = st.number_input("Green Space Area (sq. meters)", 1000, 10000, 5000)
-walk = st.slider("Walking Distance (mins)", 0, 30, 10)
-shade = st.slider("Shade Coverage (%)", 0, 100, 50)
+# Display prediction
+st.subheader("🎯 Predicted Wellbeing Score")
+st.metric(label="Wellbeing Score", value=round(prediction, 2))
 
-# Prediction
-input_df = pd.DataFrame([[ndvi, tree_density, area, walk, shade]],
-                        columns=features)
-
-scaled_input = scaler.transform(input_df)
-prediction = model.predict(scaled_input)
-
-st.success(f"🧠 Predicted Wellbeing Score: {round(prediction[0], 2)}")
+# Show inputs
+st.subheader("📋 Your Input Summary")
+st.dataframe(input_df)
