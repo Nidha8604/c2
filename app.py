@@ -10,7 +10,7 @@ st.title("🌿 University Green Space & Wellbeing Predictor")
 df = pd.read_csv("university_student_wellbeing_synthetic.csv")
 
 # Define features and target
-features = ["NDVI Score", "Tree Density", "Green Space Area (sq.meters)",
+features = ["NDVI Score", "Green Space Area (sq.meters)",
             "Walking Distance (mins)", "Shade Coverage (%)", "Academic Stress Level"]
 target = "Predicted Wellbeing Score"
 
@@ -18,14 +18,13 @@ target = "Predicted Wellbeing Score"
 st.sidebar.header("Input Green Space and Student Parameters")
 
 ndvi = st.sidebar.slider("NDVI Score", 0.3, 0.9, 0.6)
-tree_density = st.sidebar.slider("Tree Density", 1.0, 10.0, 5.0)
 area = st.sidebar.number_input("Green Space Area (sq. meters)", 100, 10000, 5000)
 walk = st.sidebar.slider("Walking Distance (mins)", 1, 30, 10)
 shade = st.sidebar.slider("Shade Coverage (%)", 0.0, 100.0, 50.0)
 stress = st.sidebar.slider("Academic Stress Level", 1, 10, 5)
 
 # Prepare input
-input_df = pd.DataFrame([[ndvi, tree_density, area, walk, shade, stress]], columns=features)
+input_df = pd.DataFrame([[ndvi, area, walk, shade, stress]], columns=features)
 
 # Train model
 X = df[features]
